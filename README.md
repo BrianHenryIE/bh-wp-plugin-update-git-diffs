@@ -1,6 +1,16 @@
 [![WordPress tested 5.5](https://img.shields.io/badge/WordPress-v5.5%20tested-0073aa.svg)](https://wordpress.org/plugins/plugin_slug) [![PHPCS WPCS](https://img.shields.io/badge/PHPCS-WordPress%20Coding%20Standards-8892BF.svg)](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/plugin_slug/)
 
-# BH WP Plugin Update Git Diffs
+# Plugin Update Git Diffs
+
+When a plugin update becomes available, run `git diff` on it and save as a custom post type, linked from the plugins screen.
+
+`vendor/bin/wp transient delete update_plugins --network`
+
+Plugin_Installer_Skin
+
+should also act on zips uploaded
+
+XDEBUG_MODE=coverage composer run-script coverage-tests
 
 ## Contributing
 

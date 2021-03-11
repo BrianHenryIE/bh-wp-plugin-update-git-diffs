@@ -21,7 +21,7 @@ class PluginsPageCest
 	 */
 	public function testPluginsPageForName( AcceptanceTester $I ) {
 
-		$I->canSee( 'BH WP Plugin Update Git Diffs' );
+		$I->canSee( 'Plugin Update Git Diffs' );
 	}
 
 	/**

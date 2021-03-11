@@ -1,9 +1,8 @@
 parameters:
-    level: 6
+    level: 8
     paths:
         - src
     excludePaths:
-        - src/vendor/*
-        - src/dependencies/*
+        - src/Mozart/*
     bootstrapFiles:
         - src/autoload.php

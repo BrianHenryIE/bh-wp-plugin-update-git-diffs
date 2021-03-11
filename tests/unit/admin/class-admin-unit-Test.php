@@ -8,12 +8,16 @@
  * @author Brian Henry <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_Plugin_Update_Git_Diffs\Admin;
+namespace BrianHenryIE\WP_Plugin_Update_Git_Diffs\Admin;
+
+
+use BrianHenryIE\WP_Plugin_Update_Git_Diffs\API\Settings_Interface;
+use BrianHenryIE\WP_Plugin_Update_Git_Diffs\Mozart\Psr\Log\NullLogger;
 
 /**
  * Class Admin_Test
  *
- * @covers \BH_WP_Plugin_Update_Git_Diffs\Admin\Admin
+ * @covers \BrianHenryIE\WP_Plugin_Update_Git_Diffs\Admin\Admin
  */
 class Admin_Test extends \Codeception\Test\Unit {
 
@@ -45,7 +49,7 @@ class Admin_Test extends \Codeception\Test\Unit {
 	 * Verifies enqueue_styles() calls wp_enqueue_style() with appropriate parameters.
 	 * Verifies the .css file exists.
 	 *
-	 * @covers Admin::enqueue_styles
+	 * @covers BrianHenryIE\WP_Plugin_Update_Git_Diffs\Admin\Admin::enqueue_styles
 	 * @see wp_enqueue_style()
 	 */
 	public function test_enqueue_styles() {
@@ -70,50 +74,17 @@ class Admin_Test extends \Codeception\Test\Unit {
 			)
 		);
 
-		$admin = new Admin();
+        $settings = $this->makeEmpty( Settings_Interface::class,
+            array(
+                'get_plugin_version' => '1.0.0'
+            ));		$logger = new NullLogger();
+
+		$admin = new Admin( $settings, $logger );
 
 		$admin->enqueue_styles();
 
 		$this->assertFileExists( $css_file );
 	}
 
-	/**
-	 * Verifies enqueue_scripts() calls wp_enqueue_script() with appropriate parameters.
-	 * Verifies the .js file exists.
-	 *
-	 * @covers Admin::enqueue_scripts
-	 * @see wp_enqueue_script()
-	 */
-	public function test_enqueue_scripts() {
 
-		global $plugin_root_dir;
-
-		// Return any old url.
-		\WP_Mock::userFunction(
-			'plugin_dir_url',
-			array(
-				'return' => $plugin_root_dir . '/admin/',
-			)
-		);
-
-		$handle    = $this->plugin_name;
-		$src       = $plugin_root_dir . '/admin/js/bh-wp-plugin-update-git-diffs-admin.js';
-		$deps      = array( 'jquery' );
-		$ver       = $this->version;
-		$in_footer = true;
-
-		\WP_Mock::userFunction(
-			'wp_enqueue_script',
-			array(
-				'times' => 1,
-				'args'  => array( $handle, $src, $deps, $ver, $in_footer ),
-			)
-		);
-
-		$admin = new Admin( $this->plugin_name, $this->version );
-
-		$admin->enqueue_scripts();
-
-		$this->assertFileExists( $src );
-	}
 }

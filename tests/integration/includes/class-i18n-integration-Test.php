@@ -6,7 +6,7 @@
  * @author  BrianHenryIE <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_Plugin_Update_Git_Diffs\Includes;
+namespace BrianHenryIE\WP_Plugin_Update_Git_Diffs\Includes;
 
 /**
  * Class BH_WP_Plugin_Update_Git_Diffs_Test

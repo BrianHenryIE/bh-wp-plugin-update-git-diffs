@@ -6,12 +6,12 @@
  * @author  BrianHenryIE <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_Plugin_Update_Git_Diffs\Includes;
+namespace BrianHenryIE\WP_Plugin_Update_Git_Diffs\Includes;
 
 /**
  * Class Plugin_WP_Mock_Test
  *
- * @covers \BH_WP_Plugin_Update_Git_Diffs\Includes\I18n
+ * @covers \BrianHenryIE\WP_Plugin_Update_Git_Diffs\Includes\I18n
  */
 class I18n_Unit_Test extends \Codeception\Test\Unit {
 
@@ -28,21 +28,33 @@ class I18n_Unit_Test extends \Codeception\Test\Unit {
 	/**
 	 * Verify load_plugin_textdomain is correctly called.
 	 *
-	 * @covers I18n::load_plugin_textdomain
+	 * @covers BrianHenryIE\WP_Plugin_Update_Git_Diffs\Includes\I18n::load_plugin_textdomain
 	 */
 	public function test_load_plugin_textdomain() {
 
 		global $plugin_root_dir;
 
-		\WP_Mock::userFunction(
-			'load_plugin_textdomain',
-			array(
-				'args'   => array(
-					'bh-wp-plugin-update-git-diffs',
-					false,
-					$plugin_root_dir . '/languages/',
-				)
-			)
-		);
+        \WP_Mock::userFunction(
+            'plugin_basename',
+            array(
+                'args' => array(  \WP_Mock\Functions::type( 'string' ) ),
+                'return' => $plugin_root_dir
+            )
+        );
+
+        \WP_Mock::userFunction(
+            'load_plugin_textdomain',
+            array(
+                'args'   => array(
+                    'bh-wp-plugin-update-git-diffs',
+                    false,
+                    $plugin_root_dir . '/Languages/',
+                )
+            )
+        );
+
+		$sut = new I18n();
+
+		$sut->load_plugin_textdomain();
 	}
 }

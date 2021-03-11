@@ -13,8 +13,7 @@
 
     <exclude-pattern>/assets/</exclude-pattern>
     <exclude-pattern>/scratch/</exclude-pattern>
-    <exclude-pattern>/src/dependencies/*</exclude-pattern>
-    <exclude-pattern>/src/vendor/*</exclude-pattern>
+    <exclude-pattern>/src/Mozart/*</exclude-pattern>
     <exclude-pattern>/tests/</exclude-pattern>
     <exclude-pattern>/vendor/*</exclude-pattern>
     <exclude-pattern>/wordpress/</exclude-pattern>

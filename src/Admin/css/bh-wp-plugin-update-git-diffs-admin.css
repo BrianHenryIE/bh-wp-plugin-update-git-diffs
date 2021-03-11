@@ -2,3 +2,18 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+
+
+.diff-line {
+    font-family: monospace;
+    margin: 1px;
+}
+
+.diff-line.add {
+    color: red;
+}
+
+.diff-line.delete {
+    color: green;
+}

@@ -6,14 +6,14 @@
  * @author  BrianHenryIE <BrianHenryIE@gmail.com>
  */
 
-namespace BH_WP_Plugin_Update_Git_Diffs\Includes;
+namespace BrianHenryIE\WP_Plugin_Update_Git_Diffs\Includes;
 
 /**
  * Class I18n_Test
  *
  * @see I18n
  */
-class I18n_WP_Unit_Test extends \Codeception\TestCase\WPTestCase {
+class I18n_WPUnit_Test extends \Codeception\TestCase\WPTestCase {
 
 	/**
 	 * Checks if the filter run by WordPress in the load_plugin_textdomain() function is called.
