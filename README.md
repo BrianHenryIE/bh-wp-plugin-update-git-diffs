@@ -1,16 +1,38 @@
-[![WordPress tested 5.5](https://img.shields.io/badge/WordPress-v5.5%20tested-0073aa.svg)](https://wordpress.org/plugins/plugin_slug) [![PHPCS WPCS](https://img.shields.io/badge/PHPCS-WordPress%20Coding%20Standards-8892BF.svg)](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/plugin_slug/)
+[![WordPress tested 5.7](https://img.shields.io/badge/WordPress-v5.7%20tested-0073aa.svg)](https://wordpress.org/plugins/plugin_slug) [![PHPCS WPCS](https://img.shields.io/badge/PHPCS-WordPress%20Coding%20Standards-8892BF.svg)](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) [![PHPUnit ](.github/coverage.svg)](https://brianhenryie.github.io/plugin_slug/)
 
 # Plugin Update Git Diffs
 
 When a plugin update becomes available, run `git diff` on it and save as a custom post type, linked from the plugins screen.
 
+Adds "View diff" to plugins.php
+
+![Plugins.php notice](./assets/screenshot-2.png "Plugins.php notice")
+
+Which links to a diff:
+
+![Example diff](./assets/screenshot-1.png "Example diff")
+
+No settings.
+
+[Download from releases](https://github.com/BrianHenryIE/bh-wp-plugin-update-git-diffs/releases). Note: not WordPress.org because this plugin is in its infancy. Please report issues (ideally via PR).
+
+## Notes
+
+### Clear important transient
+
+When testing, run this to clear the transient to force it be rebuilt and trigger the plugin: 
+
 `vendor/bin/wp transient delete update_plugins --network`
 
-Plugin_Installer_Skin
+This should be added to a ~"has plugin just been updated" function.
 
-should also act on zips uploaded
+## TODO
 
-XDEBUG_MODE=coverage composer run-script coverage-tests
+Should also execute on zips when uploaded.
+
+Rather than using Git on the server (may not exist), use: `composer require sebastian/diff`
+
+Logger is janky. 
 
 ## Contributing
 
@@ -33,8 +55,9 @@ mysql_password="secret"
 # Make .env available to bash.
 export $(grep -v '^#' .env.testing | xargs)
 
-# Create the databases.
+# Create the databases. (one CREATE USER for MySQL, one for MariaDB).
 mysql -u $mysql_username -p$mysql_password -e "CREATE USER '"$TEST_DB_USER"'@'%' IDENTIFIED WITH mysql_native_password BY '"$TEST_DB_PASSWORD"';";
+mysql -u $mysql_username -p$mysql_password -e "CREATE USER '"$TEST_DB_USER"'@'%' IDENTIFIED BY '"$TEST_DB_PASSWORD"';";
 mysql -u $mysql_username -p$mysql_password -e "CREATE DATABASE "$TEST_SITE_DB_NAME"; USE "$TEST_SITE_DB_NAME"; GRANT ALL PRIVILEGES ON "$TEST_SITE_DB_NAME".* TO '"$TEST_DB_USER"'@'%';";
 mysql -u $mysql_username -p$mysql_password -e "CREATE DATABASE "$TEST_DB_NAME"; USE "$TEST_DB_NAME"; GRANT ALL PRIVILEGES ON "$TEST_DB_NAME".* TO '"$TEST_DB_USER"'@'%';";
 ```
@@ -65,9 +88,7 @@ vendor/bin/codecept run acceptance;
 Output and merge code coverage with:
 
 ```
-vendor/bin/codecept run unit --coverage unit.cov;
-vendor/bin/codecept run wpunit --coverage wpunit.cov;
-vendor/bin/phpcov merge --clover tests/_output/clover.xml --html tests/_output/html tests/_output --text;
+XDEBUG_MODE=coverage composer run-script coverage-tests
 ```
 
 To save changes made to the acceptance database:

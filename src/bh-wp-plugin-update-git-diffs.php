@@ -15,7 +15,7 @@
  * Plugin Name:       Plugin Update Git Diffs
  * Plugin URI:        http://github.com/username/bh-wp-plugin-update-git-diffs/
  * Description:       When a plugin update becomes available, it is downloaded and a diff is run against the current code. A link to view it is added in the plugins.php update notification.
- * Version:           1.0.2
+ * Version:           1.0.3
  * Author:            BrianHenryIE
  * Author URI:        https://BrianHenryIE.com/
  * License:           GPL-2.0+
@@ -41,7 +41,7 @@ require_once plugin_dir_path( __FILE__ ) . 'autoload.php';
 /**
  * Current plugin version.
  */
-define( 'BH_WP_PLUGIN_UPDATE_GIT_DIFFS_VERSION', '1.0.2' );
+define( 'BH_WP_PLUGIN_UPDATE_GIT_DIFFS_VERSION', '1.0.3' );
 
 /**
  * Begins execution of the plugin.

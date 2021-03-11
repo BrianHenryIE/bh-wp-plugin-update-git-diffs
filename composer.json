@@ -44,8 +44,7 @@
     "require": {
         "php": ">=7.4",
         "brianhenryie/wp-logger": "dev-master",
-        "pablo-sg-pacheco/wp-namespace-autoloader": "dev-master",
-        "sebastian/diff": "^4.0"
+        "pablo-sg-pacheco/wp-namespace-autoloader": "dev-master"
     },
     "require-dev": {
         "10up/wp_mock": "0.4.2",

@@ -20,6 +20,4 @@ interface Settings_Interface {
 	 */
 	public function get_plugin_version(): string;
 
-    public function get_plugin_slug(): string;
-
 }

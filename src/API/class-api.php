@@ -14,7 +14,6 @@
 
 namespace BrianHenryIE\WP_Plugin_Update_Git_Diffs\API;
 
-use BrianHenryIE\WP_Plugin_Update_Git_Diffs\Mozart\SebastianBergmann\Diff\Differ;
 use Exception;
 use BrianHenryIE\WP_Plugin_Update_Git_Diffs\Includes\Post;
 use BrianHenryIE\WP_Plugin_Update_Git_Diffs\Mozart\Psr\Log\LoggerInterface;
@@ -147,11 +146,11 @@ class API implements API_Interface {
 		$extracted_update_dir_path = $extracted_update_dir_path . DIRECTORY_SEPARATOR . $plugin_slug;
 
 		try {
-            $diff_string = $this->diff_dirs($existing_plugin_dir, $extracted_update_dir_path);
-        } catch( \Exception $e ) {
-		    $this->logger->error( $e->getMessage() );
-		    return;
-        }
+			$diff_string = $this->diff_dirs( $existing_plugin_dir, $extracted_update_dir_path );
+		} catch ( \Exception $e ) {
+			$this->logger->error( $e->getMessage() );
+			return;
+		}
 
 		$post_data = array(
 			'post_content'          => wp_slash( $diff_string ),
@@ -176,17 +175,6 @@ class API implements API_Interface {
 		$this->logger->info( "Added post {$post_name}" );
 	}
 
-//	public function dfff( $a, $b ) {
-//
-//        $differ = new Differ;
-//
-//        // Dir list both to create full
-//
-//
-//
-//        print $differ->diff('foo', 'bar');
-//    }
-
 	/**
 	 * Run exec() to run `git diff` on the two directories specified.
 	 * Returns the diff as a single string, with any file paths mentioned shorted to remove ABSPATH and the temp path.
@@ -202,47 +190,19 @@ class API implements API_Interface {
 	 *
 	 * @return string
 	 *
-	 * @throws \Exception If exec cannot be called, if Git executable does not exist, or if the it command exits unsuccessfully.
+	 * @throws Exception Generic Exception when the operation fails.
 	 */
 	public function diff_dirs( string $absolute_dir_path_1, string $absolute_dir_path_2 ): string {
 
-		if ( ! $this->exec_enabled() ) {
-			throw new Exception( 'PHP exec not available on this server' );
+		$diff_cmd = "/usr/bin/git diff --no-index -G. {$absolute_dir_path_1} {$absolute_dir_path_2}";
+
+		$output = $this->run( $diff_cmd );
+
+		if ( empty( $output ) ) {
+			throw new Exception();
 		}
 
-		// -G. ignores file mode changes (chmod.644/755).
-        $diff_cmd = "git diff --no-index -G. {$absolute_dir_path_1} {$absolute_dir_path_2}";
-
-        $diff_cmd = "/usr/bin/git diff --no-index -G. {$absolute_dir_path_1} {$absolute_dir_path_2}";
-
-
-
-		$output = array();
-
-		/* phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec */
-//		$result = exec( $diff_cmd, $output, $result_code );
-
-        $output = $this->run( $diff_cmd );
-
-//		/* @phpstan-ignore-next-line php.com documentation says exec can return false but the PhpDoc does not. */
-//		if ( false === $result ) {
-//			$message = 'PHP exec failed';
-//			$this->logger->error( $message, array( 'exec' => $diff_cmd ) );
-//			throw new Exception( $message );
-//		}
-//
-//		// Presumably this won't be reached when there's a real error.
-//		if ( 0 !== $result_code && 1 !== $result_code ) {
-//			$message = "PHP exec return with exit code {$result_code}";
-//			$this->logger->error( $message, array( 'exec' => $diff_cmd ) );
-//			throw new Exception( $message );
-//		}
-
-//		$this->logger->info( "Executed `{$diff_cmd}` which returned with exit code {$result_code}" );
-
-//		$diff_string = implode( "\n", $output );
-
-        $diff_string = $output;
+		$diff_string = $output;
 
 		// Remove the absolute directory paths, since they're mostly redundant and don't add any useful information.
 		$diff_string = str_replace( $absolute_dir_path_2 . DIRECTORY_SEPARATOR, '', $diff_string );
@@ -252,42 +212,52 @@ class API implements API_Interface {
 	}
 
 	/**
-	 * Determine the PHP `exec` function available on this server.
+	 * Use proc_open to execute a command (Git).
 	 *
-	 * @see https://stackoverflow.com/questions/3938120/check-if-exec-is-disabled
-	 * @see https://www.php.net/manual/en/function.exec.php
+	 * @see proc_open()
+	 * @see https://stackoverflow.com/questions/34778191/run-git-push-origin-master-commands-using-php
 	 *
-	 * @return bool
+	 * @param string        $command The command to execute.
+	 * @param array<string> $arguments Optional arguments.
+	 * @return string
+	 *
+	 * @throws Exception Generic Exception when the operation fails.
 	 */
-	protected function exec_enabled(): bool {
-		$disabled_functions = ini_get( 'disable_functions' );
-		if ( ! is_string( $disabled_functions ) ) {
-			return function_exists( 'exec' );
-		}
-		$disabled = explode( ',', $disabled_functions );
-		return function_exists( 'exec' ) && ! in_array( 'exec', $disabled, true );
-	}
+	protected function run( string $command, array $arguments = array() ): string {
 
-	// https://stackoverflow.com/questions/34778191/run-git-push-origin-master-commands-using-php
-    private function run($command, array $arguments = array()) {
-        $pipes = array();
-        $descriptorspec = array(
-            array('pipe', 'r'),  // STDIN
-            array('pipe', 'w'),  // STDOUT
-            array('file', get_temp_dir() . 'error.txt', 'w'),  // STDERR
-        );
-        $process = proc_open($command, $descriptorspec, $pipes);
-        foreach ($arguments as $arg) {
-            // Write each of the supplied arguments to STDIN
-            fwrite($pipes[0], (preg_match("/\n(:?\s+)?$/", $arg) ? $arg : "{$arg}\n"));
-        }
-        $response = stream_get_contents($pipes[1]);
-        // Make sure that each pipe is closed to prevent a lockout
-        foreach ($pipes as $pipe) {
-            fclose($pipe);
-        }
-        proc_close($process);
-        return $response;
-    }
+		$pipes           = array();
+		$descriptor_spec = array(
+			array( 'pipe', 'r' ),  // STDIN.
+			array( 'pipe', 'w' ),  // STDOUT.
+			array( 'file', get_temp_dir() . 'error.txt', 'w' ),  // STDERR.
+		);
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_proc_open
+		$process = proc_open( $command, $descriptor_spec, $pipes );
+
+		if ( false === $process ) {
+			throw new Exception();
+		}
+
+		foreach ( $arguments as $arg ) {
+			// Write each of the supplied arguments to STDIN.
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fwrite
+			fwrite( $pipes[0], ( preg_match( "/\n(:?\s+)?$/", $arg ) ? $arg : "{$arg}\n" ) );
+		}
+		$response = stream_get_contents( $pipes[1] );
+
+		if ( false === $response ) {
+			throw new Exception();
+		}
+
+		// Make sure that each pipe is closed to prevent a lockout.
+		foreach ( $pipes as $pipe ) {
+		    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
+			fclose( $pipe );
+		}
+		proc_close( $process );
+
+		return $response;
+	}
 
 }
